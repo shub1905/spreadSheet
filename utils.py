@@ -4,6 +4,7 @@ import numpy
 class GraphNode(object):
 
     def __init__(self):
+        self.key = ''
         self.val = []  # post fix Stack
         self.child = []  # depency nodes
         self.color = 0  # 0: unvisited, 1: gray, 2: black
