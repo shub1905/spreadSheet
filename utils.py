@@ -11,21 +11,28 @@ class GraphNode(object):
 
 def cellname(row, column):
     # convert '35, 27'
-    key = chr(ord('A') + column) + str(row + 1)
+    if not column:
+        columnName = 'A'
+    else:
+        columnName = ''
+        while(column > 0):
+            columnName += chr(column % 26 + ord('A'))
+            column = column // 26
+
+    key = columnName + str(row + 1)
     return key
 
 
-def key2val(var, spreadSheet):
+def key2val(var):
     # sample var = AZ123
-    column = ''
+    column, row = 0, 0
     for i, char in enumerate(var):
         if char <= 'Z' and char >= 'A':
-            column += char
+            column = column * 26 + (ord(char) - ord('A'))
         else:
-            row = int(var[i:])
+            row = int(var[i:]) - 1
             break
-    column = ord(column) - ord('A')
-    return spreadsheet[row, column]
+    return [row, column]
 
 
 def maths(operation, params):
@@ -40,3 +47,12 @@ def maths(operation, params):
         return (params[0] / params[1])
     else:
         raise 'Operation not defined'
+
+
+def generatekeys(Graph):
+    keys2 = Graph.keys()
+    keys = map(lambda x: key2val(x), keys2)
+    keys.sort()
+
+    for k in keys:
+        yield k
