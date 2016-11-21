@@ -7,16 +7,15 @@ We read the spread sheet as a csv from the specified input file if it exists. Th
 
 This is followed by a traversal of Graph in a Depth First fashion. We evaluate all the depending cells first and then try to evaluate current Cell. We check for Circular references while evaluating the children and check for Wrong Expressions while evaluating the Cell.
 
-This solution is recommended as it presents most optimal way to resolve dependencies and detect circular references, i.e., using Depth First Search.
+This solution is recommended as it presents most optimal way to resolve dependencies and detect circular references, i.e., using Depth First Search. Also the current implementation allows for extending operators by augmenting *mathOperation* function and allowed *operations* list.
 
 ### Complexity
-Time Complexity: O(V+E)
-
-We'll take O(V) to read the sheet, create a Graph and output the solved sheet. The evaluation takes O(V' + E) time where V'= Number of non-empty Cells.
-
-
-Space Complexity: O(V+E)
+#### Time Complexity: O(V+E)
+We'll take O(V) to read the sheet, create a Graph and output the solved sheet. The evaluation takes O(V' + E) time.
+#### Space Complexity: O(V+E)
+The auxillary space used by generated Graph and spreadsheet matrix is O(V+E).
 
 where,  
+V'= Number of non-empty Cells  
 V = Number of Cells  
 E = Total number of inter-cell References
