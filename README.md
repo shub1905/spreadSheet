@@ -5,7 +5,7 @@ The submitted solution uses a Hash Map to maintain the Adjacency List representa
 
 We read the spread sheet as a csv from the specified input file if it exists. Then we create a dependency Graph as specified above by reading the contents of a Cell. During the Graph Creation we check for proper cell referencing and bad arguments if present in the Cell.
 
-This is followed by a traversal of Graph in a Depth First fashion. We evaluate all the depending cells first and then try to evaluate current Cell. We check for Circular references while evaluating the children and check for Wrong Expressions while evaluating the Cell.
+This is followed by a traversal of Graph in a Depth First fashion. We evaluate all the depending cells first and then try to evaluate current Cell. We check for Circular references while evaluating the children and check for correctness of expressions while evaluating the Cell.
 
 This solution is recommended as it presents most optimal way to resolve dependencies and detect circular references, i.e., using Depth First Search. Also the current implementation allows for extending operators by augmenting *mathOperation* function and allowed *operations* list.
 
