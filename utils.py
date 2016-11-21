@@ -52,16 +52,25 @@ def mathOperation(operation, params):
     '''
         perform operation on constants
     '''
+    ans = 0
+    b = params.pop()
+    a = params.pop()
+
     if operation == '+':
-        return sum(params)
+        ans = a+b
     elif operation == '-':
-        return (params[0] - params[1])
+        ans = a-b
     elif operation == '*':
-        return (params[0] * params[1])
+        ans = a*b
     elif operation == '/':
-        return (params[0] / params[1])
+        if b == 0:
+            raise Exception('Division by Zero')
+        ans = a*1./b
     else:
         raise Exception('Operation not defined')
+
+    params.append(ans)
+    return params
 
 
 def test():

@@ -1,6 +1,6 @@
 from utils import *
 
-operations = ['+', '-', '*', '/']
+OPERATIONS = ['+', '-', '*', '/']
 
 
 def readFile(filename):
@@ -29,12 +29,12 @@ def outputSheet(Graph, spreadsheet, filename):
                 bufferstring.append('')
             else:
                 key = cellName(i, j)
-                nodeval = Graph[key].val[0]
+                nodevalue = Graph[key].val[0]
 
-                if nodeval == int(nodeval):
-                    bufferstring.append(str(int(nodeval)))
+                if nodevalue == int(nodevalue):
+                    bufferstring.append(str(int(nodevalue)))
                 else:
-                    bufferstring.append(str(float(nodeval)))
+                    bufferstring.append(str(float(nodevalue)))
 
         line = ','.join(bufferstring)
         fd.write(line + '\n')
@@ -54,7 +54,10 @@ def generateGraph(spreadsheet):
                 temp = GraphNode()
 
                 # reversed to treat it as a stack
-                temp.val = cell.split(' ')[::-1]
+                postfix = cell.split(' ')[::-1]
+                for var in postfix:
+                    if var != '':
+                        temp.val.append(var)
                 key = cellName(i, j)
                 temp.key = key
                 Graph[key] = temp
@@ -79,11 +82,12 @@ def linkGraph(Graph):
                          "Cell {}: {} doesn't exists or has empty Value").format(cell.key, var)
                 raise Exception(error)
 
-            elif var not in operations:
+            elif var not in OPERATIONS:
                 try:
                     postfix[i] = float(postfix[i])
                 except ValueError:
-                    error = 'Bad argument\n\t{} in Cell {}'.format(var, cell.key)
+                    error = 'Bad argument\n\t{} in Cell {}'.format(
+                        var, cell.key)
                     raise Exception(error)
 
     return Graph
@@ -96,7 +100,8 @@ def evaluateSheet(node, Graph):
     node.color = 1
     for child in node.child:
         if child.color == 1:
-            error = 'Circular Reference between {} and {}'.format(node.key, child.key)
+            error = 'Circular Reference between {} and {}'.format(
+                node.key, child.key)
             raise Exception(error)
 
         evaluateSheet(child, Graph)
@@ -108,12 +113,10 @@ def evaluateSheet(node, Graph):
 def evaluateCell(node, Graph):
     postfix = node.val
     params = []
-    while(len(postfix) > 0):
+    while len(postfix) > 0:
         var = postfix.pop()
-        if var in operations:
-            ans = mathOperation(var, params)
-            postfix.append(ans)
-            params = []
+        if var in OPERATIONS:
+            params = mathOperation(var, params)
         elif var in Graph:
             params.extend(Graph[var].val)
         else:
@@ -122,7 +125,7 @@ def evaluateCell(node, Graph):
     if len(params) != 1:
         raise Exception('Wrong Expression in Cell {}'.format(node.key))
 
-    node.val.extend(params)
+    node.val = params
 
 
 def main(infile, outfile):
