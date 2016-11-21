@@ -7,7 +7,7 @@ We read the spread sheet as a csv from the specified input file if it exists. Th
 
 This is followed by a traversal of Graph in a Depth First fashion. We evaluate all the depending cells first and then try to evaluate current Cell. We check for Circular references while evaluating the children and check for correctness of expressions while evaluating the Cell.
 
-This solution is recommended as it presents most optimal way to resolve dependencies and detect circular references, i.e., using Depth First Search. In the current solution we'll never have to evaluate an empty or visited node. It allows for irregular size spread sheets to be input, i.e. spread sheet needs not be a perfect m*n matrix. Also the current implementation allows for extending operators by augmenting *mathOperation* function and allowed *operations* list.
+This solution is recommended as it presents most optimal way to resolve dependencies and detect circular references, i.e., using Depth First Search. In the current solution we'll never have to evaluate an empty or visited node. It allows for irregular size spread sheets to be input, i.e. spread sheet needs not be a perfect m\*n matrix. Also the current implementation allows for extending operators by augmenting *mathOperation* function and allowed *operations* list.
 
 ### Complexity
 #### Time Complexity: O(V+E)
