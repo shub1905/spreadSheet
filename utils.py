@@ -1,4 +1,5 @@
 import numpy
+import sys
 
 
 class GraphNode(object):
@@ -12,13 +13,14 @@ class GraphNode(object):
 
 def cellname(row, column):
     # convert '35, 27'
-    if not column:
-        columnName = 'A'
-    else:
-        columnName = ''
-        while(column > 0):
-            columnName += chr(column % 26 + ord('A'))
-            column = column // 26
+
+    columnName = ''
+    while(column > 0):
+        columnName = chr(column % 26 + ord('A')) + columnName
+        column = column // 26 - 1
+
+    if column == 0:
+        columnName = 'A' + columnName
 
     key = columnName + str(row + 1)
     return key
@@ -29,15 +31,14 @@ def key2val(var):
     column, row = 0, 0
     for i, char in enumerate(var):
         if char <= 'Z' and char >= 'A':
-            column = column * 26 + (ord(char) - ord('A'))
+            column = column * 26 + (ord(char) - ord('A') + 1)
         else:
-            row = int(var[i:]) - 1
+            row = int(var[i:])
             break
-    return [row, column]
+    return [row - 1, column - 1]
 
 
 def maths(operation, params):
-    params = map(int, params)
     if operation == '+':
         return sum(params)
     elif operation == '-':
@@ -47,7 +48,7 @@ def maths(operation, params):
     elif operation == '/':
         return (params[0] / params[1])
     else:
-        raise 'Operation not defined'
+        raise Exception('Operation not defined')
 
 
 def generatekeys(Graph):
@@ -57,3 +58,13 @@ def generatekeys(Graph):
 
     for k in keys:
         yield k
+
+
+def test():
+    assert(cellname(35, 27) == 'AB36')
+    assert(cellname(0, 0) == 'A1')
+    assert(cellname(8, 3) == 'D9')
+
+    assert(key2val('AB36') == [35, 27])
+    assert(key2val('A1') == [0, 0])
+    assert(key2val('D9') == [8, 3])

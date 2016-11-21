@@ -1,29 +1,20 @@
-'''
-Test Cases
-
-2. circular recursion
-3. Improper Expression
-4. Improper Referenec
-'''
-
 from utils import *
 
 operations = ['+', '-', '*', '/']
 
 
-def readfile(filename='input.txt'):
+def readfile(filename):
     '''
     return spreadSheet: 2D array from spreadsheet
     '''
     spreadsheet = []
-    # ToDO: check for validity of file
     for line in open(filename):
         row = line.strip().split(',')
         spreadsheet.append(row)
     return spreadsheet
 
 
-def outputfile(Graph, spreadsheet, filename='output.txt'):
+def outputfile(Graph, spreadsheet, filename):
     fd = open(filename, 'w')
     bufferstring = []
 
@@ -33,8 +24,12 @@ def outputfile(Graph, spreadsheet, filename='output.txt'):
                 bufferstring.append('')
             else:
                 key = cellname(i, j)
-                node = Graph[key]
-                bufferstring.append(str(node.val[0]))
+                nodeVal = Graph[key].val[0]
+
+                if nodeVal == int(nodeVal):
+                    bufferstring.append(str(int(nodeVal)))
+                else:
+                    bufferstring.append(str(float(nodeVal)))
 
         line = ','.join(bufferstring)
         fd.write(line + '\n')
@@ -58,22 +53,22 @@ def generateGraph(spreadsheet):
 
     return linkGraph(Graph)
 
+
 def linkGraph(Graph):
     # link nodes
     for key in Graph:
         cell = Graph[key]
         postfix = cell.val
-        for i,var in enumerate(postfix):
+        for i, var in enumerate(postfix):
             if var in Graph:
                 cell.child.append(Graph[var])
             elif var[0] <= 'Z' and var[0] >= 'A':
                 raise Exception("Improper Reference: Node doesn't exists")
             elif var not in operations:
                 try:
-                    postfix[i] = int(postfix[i])
+                    postfix[i] = float(postfix[i])
                 except ValueError:
                     raise Exception('Bad argument')
-
 
     return Graph
 
@@ -82,7 +77,7 @@ def evaluateSheet(node, Graph):
     if node.color == 2:
         return
     if node.color == 1:
-        raise Exception('Circular Recursion')
+        raise Exception('Circular Reference')
 
     node.color = 1
     for child in node.child:
@@ -107,20 +102,19 @@ def evaluateCell(node, Graph):
             params.extend([var])
 
     if len(params) != 1:
-        raise Exception('wrong evaluation')
+        raise Exception('Wrong Expression')
 
     node.val.extend(params)
 
 
-def main():
-    spreadsheet = readfile()
+def main(infile='input.txt', outfile='output.txt'):
+    spreadsheet = readfile(infile)
 
     try:
         Graph = generateGraph(spreadsheet)
     except Exception as exp:
         print 'Errors Found\n{}'.format(exp.args[0])
         return
-
 
     # tradeoff: better to hash instead of matrix if sheet is sparse
     for key in Graph:
@@ -130,7 +124,12 @@ def main():
             print 'Errors Found\n{}'.format(exp.args[0])
             return
 
-    outputfile(Graph, spreadsheet)
+    outputfile(Graph, spreadsheet, outfile)
 
-
-main()
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print '''
+        Usage: python main.py InputFile OutputFile
+        '''
+    else:
+        main(sys.argv[1], sys.argv[2])
