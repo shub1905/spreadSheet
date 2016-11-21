@@ -1,5 +1,6 @@
 import numpy
 import sys
+import os
 
 
 class GraphNode(object):
@@ -27,7 +28,8 @@ def cellname(row, column):
 
 
 def key2val(var):
-    # sample var = AZ123
+    # sample var = AB36
+
     column, row = 0, 0
     for i, char in enumerate(var):
         if char <= 'Z' and char >= 'A':
@@ -52,8 +54,8 @@ def maths(operation, params):
 
 
 def generatekeys(Graph):
-    keys2 = Graph.keys()
-    keys = map(lambda x: key2val(x), keys2)
+    keys = Graph.keys()
+    keys = map(lambda x: key2val(x), keys)
     keys.sort()
 
     for k in keys:

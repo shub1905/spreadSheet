@@ -7,6 +7,8 @@ def readfile(filename):
     '''
     return spreadSheet: 2D array from spreadsheet
     '''
+    if not os.path.exists(filename):
+        raise Exception("Input File Doesn't Exists")
     spreadsheet = []
     for line in open(filename):
         row = line.strip().split(',')
@@ -59,16 +61,19 @@ def linkGraph(Graph):
     for key in Graph:
         cell = Graph[key]
         postfix = cell.val
+
         for i, var in enumerate(postfix):
             if var in Graph:
                 cell.child.append(Graph[var])
             elif var[0] <= 'Z' and var[0] >= 'A':
-                raise Exception("Improper Reference: Node doesn't exists")
+                raise Exception(
+                    "Improper Reference\n\tCell {}: {} doesn't exists or has empty Value".format(cell.key, var))
             elif var not in operations:
                 try:
                     postfix[i] = float(postfix[i])
                 except ValueError:
-                    raise Exception('Bad argument')
+                    raise Exception(
+                        'Bad argument\n\t{} in Cell {}'.format(var, cell.key))
 
     return Graph
 
@@ -76,11 +81,13 @@ def linkGraph(Graph):
 def evaluateSheet(node, Graph):
     if node.color == 2:
         return
-    if node.color == 1:
-        raise Exception('Circular Reference')
 
     node.color = 1
     for child in node.child:
+        if child.color == 1:
+            raise Exception(
+                'Circular Reference between {} and {}'.format(node.key, child.key))
+
         evaluateSheet(child, Graph)
 
     node.color = 2
@@ -102,27 +109,22 @@ def evaluateCell(node, Graph):
             params.extend([var])
 
     if len(params) != 1:
-        raise Exception('Wrong Expression')
+        raise Exception('Wrong Expression in Cell {}'.format(node.key))
 
     node.val.extend(params)
 
 
 def main(infile='input.txt', outfile='output.txt'):
-    spreadsheet = readfile(infile)
-
     try:
+        spreadsheet = readfile(infile)
         Graph = generateGraph(spreadsheet)
+
+        for key in Graph:
+            evaluateSheet(Graph[key], Graph)
+
     except Exception as exp:
         print 'Errors Found\n{}'.format(exp.args[0])
         return
-
-    # tradeoff: better to hash instead of matrix if sheet is sparse
-    for key in Graph:
-        try:
-            evaluateSheet(Graph[key], Graph)
-        except Exception as exp:
-            print 'Errors Found\n{}'.format(exp.args[0])
-            return
 
     outputfile(Graph, spreadsheet, outfile)
 
