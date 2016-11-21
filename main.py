@@ -3,9 +3,9 @@ from utils import *
 operations = ['+', '-', '*', '/']
 
 
-def readfile(filename):
+def readFile(filename):
     '''
-    return spreadSheet: 2D array from spreadsheet
+        Generate spreadSheet: 2D array from spreadsheet
     '''
     if not os.path.exists(filename):
         raise Exception("Input File Doesn't Exists")
@@ -16,7 +16,10 @@ def readfile(filename):
     return spreadsheet
 
 
-def outputfile(Graph, spreadsheet, filename):
+def outputSheet(Graph, spreadsheet, filename):
+    '''
+        Write computed spreadsheet to file
+    '''
     fd = open(filename, 'w')
     bufferstring = []
 
@@ -25,13 +28,13 @@ def outputfile(Graph, spreadsheet, filename):
             if spreadsheet[i][j] == '':
                 bufferstring.append('')
             else:
-                key = cellname(i, j)
-                nodeVal = Graph[key].val[0]
+                key = cellName(i, j)
+                nodeval = Graph[key].val[0]
 
-                if nodeVal == int(nodeVal):
-                    bufferstring.append(str(int(nodeVal)))
+                if nodeval == int(nodeval):
+                    bufferstring.append(str(int(nodeval)))
                 else:
-                    bufferstring.append(str(float(nodeVal)))
+                    bufferstring.append(str(float(nodeval)))
 
         line = ','.join(bufferstring)
         fd.write(line + '\n')
@@ -40,6 +43,9 @@ def outputfile(Graph, spreadsheet, filename):
 
 
 def generateGraph(spreadsheet):
+    '''
+        Create Graph Nodes mapped by on Cellname
+    '''
     Graph = {}
 
     for i, row in enumerate(spreadsheet):
@@ -49,7 +55,7 @@ def generateGraph(spreadsheet):
 
                 # reversed to treat it as a stack
                 temp.val = cell.split(' ')[::-1]
-                key = cellname(i, j)
+                key = cellName(i, j)
                 temp.key = key
                 Graph[key] = temp
 
@@ -57,7 +63,9 @@ def generateGraph(spreadsheet):
 
 
 def linkGraph(Graph):
-    # link nodes
+    '''
+        Add dependency graph Node in child list
+    '''
     for key in Graph:
         cell = Graph[key]
         postfix = cell.val
@@ -65,15 +73,18 @@ def linkGraph(Graph):
         for i, var in enumerate(postfix):
             if var in Graph:
                 cell.child.append(Graph[var])
+
             elif var[0] <= 'Z' and var[0] >= 'A':
-                raise Exception(
-                    "Improper Reference\n\tCell {}: {} doesn't exists or has empty Value".format(cell.key, var))
+                error = ("Improper Reference\n\t"
+                         "Cell {}: {} doesn't exists or has empty Value").format(cell.key, var)
+                raise Exception(error)
+
             elif var not in operations:
                 try:
                     postfix[i] = float(postfix[i])
                 except ValueError:
-                    raise Exception(
-                        'Bad argument\n\t{} in Cell {}'.format(var, cell.key))
+                    error = 'Bad argument\n\t{} in Cell {}'.format(var, cell.key)
+                    raise Exception(error)
 
     return Graph
 
@@ -85,8 +96,8 @@ def evaluateSheet(node, Graph):
     node.color = 1
     for child in node.child:
         if child.color == 1:
-            raise Exception(
-                'Circular Reference between {} and {}'.format(node.key, child.key))
+            error = 'Circular Reference between {} and {}'.format(node.key, child.key)
+            raise Exception(error)
 
         evaluateSheet(child, Graph)
 
@@ -100,7 +111,7 @@ def evaluateCell(node, Graph):
     while(len(postfix) > 0):
         var = postfix.pop()
         if var in operations:
-            ans = maths(var, params)
+            ans = mathOperation(var, params)
             postfix.append(ans)
             params = []
         elif var in Graph:
@@ -114,19 +125,19 @@ def evaluateCell(node, Graph):
     node.val.extend(params)
 
 
-def main(infile='input.txt', outfile='output.txt'):
+def main(infile, outfile):
     try:
-        spreadsheet = readfile(infile)
+        spreadsheet = readFile(infile)
         Graph = generateGraph(spreadsheet)
 
         for key in Graph:
             evaluateSheet(Graph[key], Graph)
 
     except Exception as exp:
-        print 'Errors Found\n{}'.format(exp.args[0])
+        print 'Errors Found\n\t{}'.format(exp.args[0])
         return
 
-    outputfile(Graph, spreadsheet, outfile)
+    outputSheet(Graph, spreadsheet, outfile)
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

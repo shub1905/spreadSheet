@@ -4,6 +4,9 @@ import os
 
 
 class GraphNode(object):
+    '''
+        Class for cell in spreadsheet
+    '''
 
     def __init__(self):
         self.key = ''
@@ -12,8 +15,11 @@ class GraphNode(object):
         self.color = 0  # 0: unvisited, 1: gray, 2: black
 
 
-def cellname(row, column):
-    # convert '35, 27'
+def cellName(row, column):
+    '''
+        Convert row,column to Spread Sheet Key
+        eg: (35, 27) : AB36
+    '''
 
     columnName = ''
     while(column > 0):
@@ -27,9 +33,11 @@ def cellname(row, column):
     return key
 
 
-def key2val(var):
-    # sample var = AB36
-
+def keyVal(var):
+    '''
+        Convert Spread Sheet Key to row,column
+        eg: AB36: (35, 27)
+    '''
     column, row = 0, 0
     for i, char in enumerate(var):
         if char <= 'Z' and char >= 'A':
@@ -40,7 +48,10 @@ def key2val(var):
     return [row - 1, column - 1]
 
 
-def maths(operation, params):
+def mathOperation(operation, params):
+    '''
+        perform operation on constants
+    '''
     if operation == '+':
         return sum(params)
     elif operation == '-':
@@ -53,20 +64,12 @@ def maths(operation, params):
         raise Exception('Operation not defined')
 
 
-def generatekeys(Graph):
-    keys = Graph.keys()
-    keys = map(lambda x: key2val(x), keys)
-    keys.sort()
-
-    for k in keys:
-        yield k
-
-
 def test():
-    assert(cellname(35, 27) == 'AB36')
-    assert(cellname(0, 0) == 'A1')
-    assert(cellname(8, 3) == 'D9')
+    # sample testing
+    assert(cellName(35, 27) == 'AB36')
+    assert(cellName(0, 0) == 'A1')
+    assert(cellName(8, 3) == 'D9')
 
-    assert(key2val('AB36') == [35, 27])
-    assert(key2val('A1') == [0, 0])
-    assert(key2val('D9') == [8, 3])
+    assert(keyVal('AB36') == [35, 27])
+    assert(keyVal('A1') == [0, 0])
+    assert(keyVal('D9') == [8, 3])
